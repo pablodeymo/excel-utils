@@ -1,0 +1,11 @@
+[package]
+name = "excel-utils"
+version = "0.1.0"
+authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+calamine = "0.16.1"
+chrono = { version = "0.4.11", features = ["serde"] }
