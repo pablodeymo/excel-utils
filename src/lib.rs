@@ -19,7 +19,12 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
             } else {
                 None
             }
-        }
+        },
+        calamine::DataType::Float(f) => {
+            // sometimes dates are encoded as floats in Excel
+            // value 1899-12-30 + f days
+            Some(NaiveDate::from_ymd(1899, 12, 30) + chrono::Duration::days(*f as i64))
+        },
         _ => None,
     }
 }
