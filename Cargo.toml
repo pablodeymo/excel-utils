@@ -1,6 +1,6 @@
 [package]
 name = "excel-utils"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 
@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 calamine = "0.16.2"
 chrono = { version = "0.4.11", features = ["serde"] }
+bigdecimal = { version = "0.1.2", features = ["serde"] } # OJO: la version debe coincidir con la que usa diesel
