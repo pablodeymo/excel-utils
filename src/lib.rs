@@ -6,7 +6,7 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
     match field_value? {
         calamine::DataType::String(s) => {
             // if the fields are not separated by /, they are all together
-            let v: Vec<&str> = s.split("/").collect();
+            let v: Vec<&str> = s.split('/').collect();
             if v.len() == 3 {
                 let day = u32::from_str(v.get(0)?).ok()?;
                 let month = u32::from_str(v.get(1)?).ok()?;
