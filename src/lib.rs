@@ -51,7 +51,7 @@ pub fn convert_decimal(field_value: Option<&&calamine::DataType>) -> Option<BigD
     match field_value {
         Some(calamine::DataType::Float(f)) => Some(BigDecimal::from((*f * 100_f64) as i32) / 100),
         Some(calamine::DataType::Int(i)) => Some(BigDecimal::from(*i as i32)),
-        Some(calamine::DataType::String(s)) => BigDecimal::from_str(s).ok(),
+        Some(calamine::DataType::String(s)) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
         _ => None,
     }
 }
