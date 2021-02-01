@@ -9,5 +9,5 @@ edition = "2018"
 [dependencies]
 calamine = "0.16.2"
 chrono = { version = "0.4.19", features = ["serde"] }
-# OJO: la version debe coincidir con la que usa diesel
+# bigdecimal crate version must match the one used by diesel
 bigdecimal = { version = "0.1.2", features = ["serde"] }
