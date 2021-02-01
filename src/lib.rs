@@ -32,7 +32,7 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
 
 pub fn convert_string(field_value: Option<&&calamine::DataType>) -> Option<String> {
     match field_value {
-        Some(calamine::DataType::String(s)) => Some(s.clone()),
+        Some(calamine::DataType::String(s)) => Some(s.trim().to_string()),
         Some(calamine::DataType::Float(f)) => Some(format!("{}", f)),
         Some(calamine::DataType::Int(i)) => Some(format!("{}", i)),
         _ => None,
