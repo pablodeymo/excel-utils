@@ -24,7 +24,7 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
         calamine::DataType::Float(f) => {
             // sometimes dates are encoded as floats in Excel
             // value 1899-12-30 + f days
-            Some(NaiveDate::from_ymd(1899, 12, 30) + chrono::Duration::days(*f as i64))
+            Some(NaiveDate::from_ymd(1899, 12, 30) + chrono::Duration::days((*f).round() as i64))
         }
         _ => None,
     }
@@ -41,15 +41,18 @@ pub fn convert_string(field_value: Option<&&calamine::DataType>) -> Option<Strin
 
 pub fn convert_i32(field_value: Option<&&calamine::DataType>) -> Option<i32> {
     match field_value {
-        Some(calamine::DataType::Float(f)) => Some(*f as i32),
+        Some(calamine::DataType::Float(f)) => Some((*f).round() as i32),
         Some(calamine::DataType::Int(i)) => Some(*i as i32),
         _ => None,
     }
 }
 
+/// Converts float value in cell to decimal, rounding to 2 decimals
 pub fn convert_decimal(field_value: Option<&&calamine::DataType>) -> Option<BigDecimal> {
     match field_value {
-        Some(calamine::DataType::Float(f)) => Some(BigDecimal::from((*f * 100_f64) as i32) / 100),
+        Some(calamine::DataType::Float(f)) => {
+            Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100)
+        }
         Some(calamine::DataType::Int(i)) => Some(BigDecimal::from(*i as i32)),
         Some(calamine::DataType::String(s)) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
         _ => None,
