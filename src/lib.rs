@@ -11,12 +11,12 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
                 let day = u32::from_str(v.get(0)?).ok()?;
                 let month = u32::from_str(v.get(1)?).ok()?;
                 let year = i32::from_str(v.get(2)?).ok()?;
-                Some(NaiveDate::from_ymd(year, month, day))
+                NaiveDate::from_ymd_opt(year, month, day)
             } else if v.len() == 1 {
                 let day = u32::from_str(s.get(0..2)?).ok()?;
                 let month = u32::from_str(s.get(2..4)?).ok()?;
                 let year = i32::from_str(s.get(4..8)?).ok()?;
-                Some(NaiveDate::from_ymd(year, month, day))
+                NaiveDate::from_ymd_opt(year, month, day)
             } else {
                 None
             }
