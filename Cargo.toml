@@ -1,13 +1,13 @@
 [package]
 name = "excel-utils"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-calamine = "0.16.2"
+calamine = "0.17.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 # bigdecimal crate version must match the one used by diesel
 bigdecimal = { version = "0.1.2", features = ["serde"] }
