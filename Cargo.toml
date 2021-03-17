@@ -1,6 +1,6 @@
 [package]
 name = "excel-utils"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 

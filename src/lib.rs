@@ -13,18 +13,23 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
                 let year = i32::from_str(v.get(2)?).ok()?;
                 NaiveDate::from_ymd_opt(year, month, day)
             } else if v.len() == 1 {
-                let day = u32::from_str(s.get(0..2)?).ok()?;
-                let month = u32::from_str(s.get(2..4)?).ok()?;
-                let year = i32::from_str(s.get(4..8)?).ok()?;
-                NaiveDate::from_ymd_opt(year, month, day)
+                convert_str_to_date(s)
             } else {
                 None
             }
         }
         calamine::DataType::Float(f) => {
-            // sometimes dates are encoded as floats in Excel
-            // value 1899-12-30 + f days
-            Some(NaiveDate::from_ymd(1899, 12, 30) + chrono::Duration::days((*f).round() as i64))
+            let num_str = ((*f).round() as u64).to_string();
+            if num_str.len() == 8 || num_str.len() == 7 {
+                // if the field is a number, it could be the date in full digits
+                convert_str_to_date(&num_str)
+            } else {
+                // sometimes dates are encoded as floats in Excel
+                // value 1899-12-30 + f days
+                Some(
+                    NaiveDate::from_ymd(1899, 12, 30) + chrono::Duration::days((*f).round() as i64),
+                )
+            }
         }
         _ => None,
     }
@@ -65,10 +70,28 @@ pub fn convert_decimal(field_value: Option<&&calamine::DataType>) -> Option<BigD
     }
 }
 
+// Auxiliar functions
+fn convert_str_to_date(input: &str) -> Option<NaiveDate> {
+    let s = if input.len() == 8 {
+        input.to_string()
+    } else {
+        format!("0{}", input)
+    };
+    let day = u32::from_str(s.get(0..2)?).ok()?;
+    let month = u32::from_str(s.get(2..4)?).ok()?;
+    let year = i32::from_str(s.get(4..8)?).ok()?;
+    NaiveDate::from_ymd_opt(year, month, day)
+}
+
 #[cfg(test)]
 mod tests {
+    use chrono::Datelike;
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn float_date() {
+        let date_test = Some(&&calamine::DataType::Float(16112020.0));
+        let ret = crate::convert_date(date_test).unwrap();
+        assert_eq!(ret.year(), 2020);
+        assert_eq!(ret.month(), 11);
+        assert_eq!(ret.day(), 16);
     }
 }
