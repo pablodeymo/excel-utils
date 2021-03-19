@@ -1,10 +1,11 @@
 use bigdecimal::BigDecimal;
+use calamine::DataType;
 use chrono::NaiveDate;
 use std::str::FromStr;
 
-pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDate> {
+pub fn convert_date(field_value: Option<&&DataType>) -> Option<NaiveDate> {
     match field_value? {
-        calamine::DataType::String(s) => {
+        DataType::String(s) => {
             // if the fields are not separated by /, they are all together
             let v: Vec<&str> = s.split('/').collect();
             if v.len() == 3 {
@@ -18,7 +19,7 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
                 None
             }
         }
-        calamine::DataType::Float(f) => {
+        DataType::Float(f) => {
             let num_str = ((*f).round() as u64).to_string();
             if num_str.len() == 8 || num_str.len() == 7 {
                 // if the field is a number, it could be the date in full digits
@@ -35,37 +36,35 @@ pub fn convert_date(field_value: Option<&&calamine::DataType>) -> Option<NaiveDa
     }
 }
 
-pub fn convert_string(field_value: Option<&&calamine::DataType>) -> Option<String> {
+pub fn convert_string(field_value: Option<&&DataType>) -> Option<String> {
     match field_value {
-        Some(calamine::DataType::String(s)) => {
+        Some(DataType::String(s)) => {
             if s.trim().is_empty() {
                 None
             } else {
                 Some(s.trim().to_string())
             }
         }
-        Some(calamine::DataType::Float(f)) => Some(format!("{}", f)),
-        Some(calamine::DataType::Int(i)) => Some(format!("{}", i)),
+        Some(DataType::Float(f)) => Some(format!("{}", f)),
+        Some(DataType::Int(i)) => Some(format!("{}", i)),
         _ => None,
     }
 }
 
-pub fn convert_i32(field_value: Option<&&calamine::DataType>) -> Option<i32> {
+pub fn convert_i32(field_value: Option<&&DataType>) -> Option<i32> {
     match field_value {
-        Some(calamine::DataType::Float(f)) => Some((*f).round() as i32),
-        Some(calamine::DataType::Int(i)) => Some(*i as i32),
+        Some(DataType::Float(f)) => Some((*f).round() as i32),
+        Some(DataType::Int(i)) => Some(*i as i32),
         _ => None,
     }
 }
 
 /// Converts float value in cell to decimal, rounding to 2 decimals
-pub fn convert_decimal(field_value: Option<&&calamine::DataType>) -> Option<BigDecimal> {
+pub fn convert_decimal(field_value: Option<&&DataType>) -> Option<BigDecimal> {
     match field_value {
-        Some(calamine::DataType::Float(f)) => {
-            Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100)
-        }
-        Some(calamine::DataType::Int(i)) => Some(BigDecimal::from(*i as i32)),
-        Some(calamine::DataType::String(s)) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
+        Some(DataType::Float(f)) => Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100),
+        Some(DataType::Int(i)) => Some(BigDecimal::from(*i as i32)),
+        Some(DataType::String(s)) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
         _ => None,
     }
 }
@@ -85,10 +84,12 @@ fn convert_str_to_date(input: &str) -> Option<NaiveDate> {
 
 #[cfg(test)]
 mod tests {
+    use calamine::DataType;
     use chrono::Datelike;
+
     #[test]
     fn float_date() {
-        let date_test = Some(&&calamine::DataType::Float(16112020.0));
+        let date_test = Some(&&DataType::Float(16112020.0));
         let ret = crate::convert_date(date_test).unwrap();
         assert_eq!(ret.year(), 2020);
         assert_eq!(ret.month(), 11);
