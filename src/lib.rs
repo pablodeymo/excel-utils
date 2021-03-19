@@ -1,7 +1,30 @@
+use anyhow::{anyhow, Result};
 use bigdecimal::BigDecimal;
-use calamine::DataType;
+use calamine::{open_workbook_auto, DataType, Range, Reader};
 use chrono::NaiveDate;
+use std::path::Path;
 use std::str::FromStr;
+
+pub fn open_nth_workbook_from_file(path: &str, worksheet_number: usize) -> Result<Range<DataType>> {
+    Ok(match open_workbook_auto(Path::new(path))? {
+        calamine::Sheets::Xls(mut sheet) => sheet
+            .worksheet_range_at(worksheet_number)
+            .ok_or_else(|| anyhow!("Error reading file"))?
+            .map_err(|e| anyhow!("Error {}", e))?,
+        calamine::Sheets::Xlsx(mut sheet) => sheet
+            .worksheet_range_at(worksheet_number)
+            .ok_or_else(|| anyhow!("Error reading file"))?
+            .map_err(|e| anyhow!("Error {}", e))?,
+        calamine::Sheets::Xlsb(mut sheet) => sheet
+            .worksheet_range_at(worksheet_number)
+            .ok_or_else(|| anyhow!("Error reading file"))?
+            .map_err(|e| anyhow!("Error {}", e))?,
+        calamine::Sheets::Ods(mut sheet) => sheet
+            .worksheet_range_at(worksheet_number)
+            .ok_or_else(|| anyhow!("Error reading file"))?
+            .map_err(|e| anyhow!("Error {}", e))?,
+    })
+}
 
 pub fn convert_date(field_value: Option<&&DataType>) -> Option<NaiveDate> {
     match field_value? {
@@ -94,5 +117,11 @@ mod tests {
         assert_eq!(ret.year(), 2020);
         assert_eq!(ret.month(), 11);
         assert_eq!(ret.day(), 16);
+    }
+
+    #[test]
+    fn open_file() {
+        let range = crate::open_nth_workbook_from_file("src/test/open.xls", 0).unwrap();
+        assert_eq!(range.get_value((0, 0)), Some(&DataType::Int(1)));
     }
 }
