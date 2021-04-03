@@ -36,8 +36,11 @@ pub fn write_content_table(
     worksheet: &mut Worksheet,
     starting_row: u32,
     content_table: &Vec<Vec<Option<DataType>>>,
+    include_total_row: bool,
 ) -> Result<()> {
     let datetime_format = workbook.add_format().set_num_format("yyyy-mm-dd");
+    let count_rows = content_table.len();
+    let count_cols = content_table.get(0).and_then(|r| Some(r.len())).unwrap_or(0);
 
     for (i, row_content) in content_table.iter().enumerate() {
         let row: xlsxwriter::WorksheetRow = i as u32 + starting_row;
@@ -80,6 +83,20 @@ pub fn write_content_table(
         }
     }
 
+    if include_total_row && count_cols > 0 {
+        let row: xlsxwriter::WorksheetRow = count_rows as u32 + starting_row;
+        let col: xlsxwriter::WorksheetCol = count_cols as u16 - 1;
+
+        worksheet
+            .write_string(row, 0, "Total", None)
+            .map_err(|e| anyhow!("Error writting string. {:?}", e))?;
+
+        /* TODO!!!
+        worksheet
+            .write_formula(row, col, "=SUM(D4:D5)", None)
+            .map_err(|e| anyhow!("Error write formula num. {:?}", e))?;
+        */
+    }
     Ok(())
 }
 
@@ -126,7 +143,7 @@ mod tests {
         ];
 
         // Write the content
-        crate::writer::write_content_table(&workbook, &mut sheet1, 3, &content).unwrap();
+        crate::writer::write_content_table(&workbook, &mut sheet1, 3, &content, true).unwrap();
         workbook.close().unwrap();
     }
 }
