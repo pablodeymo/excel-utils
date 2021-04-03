@@ -40,7 +40,6 @@ pub fn write_content_table(
 ) -> Result<()> {
     let datetime_format = workbook.add_format().set_num_format("yyyy-mm-dd");
     let count_rows = content_table.len();
-    let count_cols = content_table.get(0).and_then(|r| Some(r.len())).unwrap_or(0);
 
     for (i, row_content) in content_table.iter().enumerate() {
         let row: xlsxwriter::WorksheetRow = i as u32 + starting_row;
@@ -83,9 +82,10 @@ pub fn write_content_table(
         }
     }
 
-    if include_total_row && count_cols > 0 {
+    if include_total_row {
         let row: xlsxwriter::WorksheetRow = count_rows as u32 + starting_row;
-        let col: xlsxwriter::WorksheetCol = count_cols as u16 - 1;
+        // TODO!!! let col: xlsxwriter::WorksheetCol = count_cols as u16 - 1;
+        // let count_cols = content_table.get(0).and_then(|r| Some(r.len())).unwrap_or(0);
 
         worksheet
             .write_string(row, 0, "Total", None)
@@ -98,6 +98,34 @@ pub fn write_content_table(
         */
     }
     Ok(())
+}
+
+pub fn write_table(
+    workbook: &Workbook,
+    worksheet: &mut Worksheet,
+    starting_row: u32,
+    header_fontcolor: FormatColor,
+    header_bgcolor: FormatColor,
+    header_titles: &[(&str, f64)],
+    content_table: &Vec<Vec<Option<DataType>>>,
+    include_total_row: bool,
+) -> Result<()> {
+    // Write the header
+    write_header(
+        workbook,
+        worksheet,
+        starting_row,
+        header_fontcolor,
+        header_bgcolor,
+        header_titles,
+    )?;
+    write_content_table(
+        workbook,
+        worksheet,
+        starting_row + 1,
+        content_table,
+        include_total_row,
+    )
 }
 
 #[cfg(test)]
@@ -116,17 +144,6 @@ mod tests {
 
         let workbook = Workbook::new("tests/header1.xlsx");
         let mut sheet1 = workbook.add_worksheet(None).unwrap();
-        // Write the header
-        crate::writer::write_header(
-            &workbook,
-            &mut sheet1,
-            2,
-            FormatColor::White,
-            FormatColor::Navy,
-            &header,
-        )
-        .unwrap();
-
         let content: Vec<Vec<Option<DataType>>> = vec![
             vec![
                 Some(DataType::DateTime(44289.0)),
@@ -142,8 +159,17 @@ mod tests {
             ],
         ];
 
-        // Write the content
-        crate::writer::write_content_table(&workbook, &mut sheet1, 3, &content, true).unwrap();
+        crate::writer::write_table(
+            &workbook,
+            &mut sheet1,
+            2,
+            FormatColor::White,
+            FormatColor::Navy,
+            &header,
+            &content,
+            true,
+        )
+        .unwrap();
         workbook.close().unwrap();
     }
 }
