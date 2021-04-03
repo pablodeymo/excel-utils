@@ -5,6 +5,9 @@ use chrono::NaiveDate;
 use std::path::Path;
 use std::str::FromStr;
 
+#[cfg(feature = "enablewriter")]
+pub mod writer;
+
 pub fn open_nth_workbook_from_file(path: &str, worksheet_number: usize) -> Result<Range<DataType>> {
     Ok(match open_workbook_auto(Path::new(path))? {
         calamine::Sheets::Xls(mut sheet) => sheet
