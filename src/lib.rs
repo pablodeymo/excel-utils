@@ -95,6 +95,11 @@ pub fn convert_decimal(field_value: Option<&&DataType>) -> Option<BigDecimal> {
     }
 }
 
+pub fn convert_naivedate_to_datatype(date: NaiveDate) -> DataType {
+    let ret = NaiveDate::signed_duration_since(date, NaiveDate::from_ymd(1899, 12, 30));
+    DataType::DateTime(ret.num_days() as f64)
+}
+
 // Auxiliar functions
 fn convert_str_to_date(input: &str) -> Option<NaiveDate> {
     let s = if input.len() == 8 {
@@ -111,7 +116,7 @@ fn convert_str_to_date(input: &str) -> Option<NaiveDate> {
 #[cfg(test)]
 mod tests {
     use calamine::DataType;
-    use chrono::Datelike;
+    use chrono::{Datelike, NaiveDate};
 
     #[test]
     fn float_date() {
@@ -126,5 +131,16 @@ mod tests {
     fn open_file() {
         let range = crate::open_nth_workbook_from_file("src/test/open.xls", 0).unwrap();
         assert_eq!(range.get_value((0, 0)), Some(&DataType::Int(1)));
+    }
+
+    #[test]
+    fn convert_naivedate_to_datatype_test() {
+        let d = NaiveDate::from_ymd(1899, 12, 31);
+        let res = crate::convert_naivedate_to_datatype(d);
+        if let DataType::DateTime(date) = res {
+            assert_eq!(date, 1.0);
+        } else {
+            panic!();
+        }
     }
 }
