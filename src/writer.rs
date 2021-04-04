@@ -35,7 +35,7 @@ pub fn write_content_table(
     workbook: &Workbook,
     worksheet: &mut Worksheet,
     starting_row: u32,
-    content_table: &Vec<Vec<Option<DataType>>>,
+    content_table: &[Vec<Option<DataType>>],
     include_total_row: bool,
 ) -> Result<()> {
     let datetime_format = workbook.add_format().set_num_format("yyyy-mm-dd");
@@ -100,6 +100,7 @@ pub fn write_content_table(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn write_table(
     workbook: &Workbook,
     worksheet: &mut Worksheet,
@@ -107,7 +108,7 @@ pub fn write_table(
     header_fontcolor: FormatColor,
     header_bgcolor: FormatColor,
     header_titles: &[(&str, f64)],
-    content_table: &Vec<Vec<Option<DataType>>>,
+    content_table: &[Vec<Option<DataType>>],
     include_total_row: bool,
 ) -> Result<()> {
     // Write the header
