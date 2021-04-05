@@ -37,6 +37,7 @@ pub fn write_content_table(
     starting_row: u32,
     content_table: &[Vec<Option<DataType>>],
     include_total_row: bool,
+    totals: Option<&[(DataType, u16, &str)]>,
 ) -> Result<()> {
     let datetime_format = workbook.add_format().set_num_format("yyyy-mm-dd");
     let count_rows = content_table.len();
@@ -84,18 +85,32 @@ pub fn write_content_table(
 
     if include_total_row {
         let row: xlsxwriter::WorksheetRow = count_rows as u32 + starting_row;
-        // TODO!!! let col: xlsxwriter::WorksheetCol = count_cols as u16 - 1;
-        // let count_cols = content_table.get(0).and_then(|r| Some(r.len())).unwrap_or(0);
-
+        // Print "Total" as a title in the last row
         worksheet
             .write_string(row, 0, "Total", None)
             .map_err(|e| anyhow!("Error writting string. {:?}", e))?;
 
-        /* TODO!!!
-        worksheet
-            .write_formula(row, col, "=SUM(D4:D5)", None)
-            .map_err(|e| anyhow!("Error write formula num. {:?}", e))?;
-        */
+        // Print each formula
+        if let Some(totals_val) = totals {
+            for (total_value, totals_col, col_letter) in totals_val {
+                let col: xlsxwriter::WorksheetCol = *totals_col;
+                let value: f64 = match *total_value {
+                    DataType::Float(f) => f,
+                    DataType::Int(v) => v as f64,
+                    _ => 0.0,
+                };
+                let formula = format!(
+                    "=SUM({}{}:{}{})",
+                    col_letter,
+                    starting_row + 1,
+                    col_letter,
+                    count_rows as u32 + starting_row
+                );
+                worksheet
+                    .write_formula_num(row, col, &formula, None, value)
+                    .map_err(|e| anyhow!("Error write formula num. {:?}", e))?;
+            }
+        }
     }
     Ok(())
 }
@@ -110,6 +125,7 @@ pub fn write_table(
     header_titles: &[(&str, f64)],
     content_table: &[Vec<Option<DataType>>],
     include_total_row: bool,
+    totals: Option<&[(DataType, u16, &str)]>,
 ) -> Result<()> {
     // Write the header
     write_header(
@@ -126,6 +142,7 @@ pub fn write_table(
         starting_row + 1,
         content_table,
         include_total_row,
+        totals,
     )
 }
 
@@ -159,6 +176,7 @@ mod tests {
                 Some(DataType::Float(5.70)),
             ],
         ];
+        let totals: [(DataType, u16, &str); 1] = [(DataType::Float(7.05), 3_u16, &"D")];
 
         crate::writer::write_table(
             &workbook,
@@ -169,6 +187,7 @@ mod tests {
             &header,
             &content,
             true,
+            Some(&totals),
         )
         .unwrap();
         workbook.close().unwrap();
