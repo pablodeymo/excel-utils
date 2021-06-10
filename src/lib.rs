@@ -117,6 +117,7 @@ fn convert_str_to_date(input: &str) -> Option<NaiveDate> {
 mod tests {
     use calamine::DataType;
     use chrono::{Datelike, NaiveDate};
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn float_date() {
