@@ -85,9 +85,14 @@ pub fn write_content_table(
 
     if include_total_row {
         let row: xlsxwriter::WorksheetRow = count_rows as u32 + starting_row;
+        let format_total_row = workbook
+            .add_format()
+            .set_bold()
+            .set_border_top(xlsxwriter::FormatBorder::Medium);
+
         // Print "Total" as a title in the last row
         worksheet
-            .write_string(row, 0, "Total", None)
+            .write_string(row, 0, "Total", Some(&format_total_row))
             .map_err(|e| anyhow!("Error writting string. {:?}", e))?;
 
         // Print each formula
@@ -107,7 +112,7 @@ pub fn write_content_table(
                     count_rows as u32 + starting_row
                 );
                 worksheet
-                    .write_formula_num(row, col, &formula, None, value)
+                    .write_formula_num(row, col, &formula, Some(&format_total_row), value)
                     .map_err(|e| anyhow!("Error write formula num. {:?}", e))?;
             }
         }
