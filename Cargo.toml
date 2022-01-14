@@ -1,6 +1,6 @@
 [package]
 name = "excel-utils"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 
@@ -19,4 +19,4 @@ xlsxwriter = { version = "0.3.2", optional = true  }
 enablewriter = ["xlsxwriter"]
 
 [dev-dependencies]
-pretty_assertions = "0.7.2"
+pretty_assertions = "1.0.0"
