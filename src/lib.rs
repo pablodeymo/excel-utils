@@ -8,6 +8,16 @@ use std::str::FromStr;
 #[cfg(feature = "enablewriter")]
 pub mod writer;
 
+/// Opens the nth worksheet of an Excel file
+///
+/// # Params
+///
+/// * `path` - path of the Excel file.
+/// * `worksheet_number` number of sheet to open.
+///
+/// # Errors
+///
+/// Return Error in case there is an error reading the file.
 pub fn open_nth_workbook_from_file(path: &str, worksheet_number: usize) -> Result<Range<DataType>> {
     Ok(match open_workbook_auto(Path::new(path))? {
         calamine::Sheets::Xls(mut sheet) => sheet
@@ -89,6 +99,7 @@ pub fn convert_i32(field_value: &&DataType) -> Option<i32> {
 }
 
 /// Converts float value in cell to decimal, rounding to 2 decimals
+#[must_use]
 pub fn convert_decimal(field_value: &&DataType) -> Option<BigDecimal> {
     match field_value {
         DataType::Float(f) => Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100),
