@@ -29,8 +29,9 @@ pub fn open_nth_workbook_from_file(path: &str, worksheet_number: usize) -> Resul
     })
 }
 
-pub fn convert_date(field_value: Option<&&DataType>) -> Option<NaiveDate> {
-    match field_value? {
+#[must_use]
+pub fn convert_date(field_value: &&DataType) -> Option<NaiveDate> {
+    match field_value {
         DataType::String(s) => {
             // if the fields are not separated by /, they are all together
             let v: Vec<&str> = s.split('/').collect();
@@ -62,39 +63,42 @@ pub fn convert_date(field_value: Option<&&DataType>) -> Option<NaiveDate> {
     }
 }
 
-pub fn convert_string(field_value: Option<&&DataType>) -> Option<String> {
+#[must_use]
+pub fn convert_string(field_value: &&DataType) -> Option<String> {
     match field_value {
-        Some(DataType::String(s)) => {
+        DataType::String(s) => {
             if s.trim().is_empty() {
                 None
             } else {
                 Some(s.trim().to_string())
             }
         }
-        Some(DataType::Float(f)) => Some(format!("{}", f)),
-        Some(DataType::Int(i)) => Some(format!("{}", i)),
+        DataType::Float(f) => Some(format!("{f}")),
+        DataType::Int(i) => Some(format!("{i}")),
         _ => None,
     }
 }
 
-pub fn convert_i32(field_value: Option<&&DataType>) -> Option<i32> {
+#[must_use]
+pub fn convert_i32(field_value: &&DataType) -> Option<i32> {
     match field_value {
-        Some(DataType::Float(f)) => Some((*f).round() as i32),
-        Some(DataType::Int(i)) => Some(*i as i32),
+        DataType::Float(f) => Some((*f).round() as i32),
+        DataType::Int(i) => Some(*i as i32),
         _ => None,
     }
 }
 
 /// Converts float value in cell to decimal, rounding to 2 decimals
-pub fn convert_decimal(field_value: Option<&&DataType>) -> Option<BigDecimal> {
+pub fn convert_decimal(field_value: &&DataType) -> Option<BigDecimal> {
     match field_value {
-        Some(DataType::Float(f)) => Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100),
-        Some(DataType::Int(i)) => Some(BigDecimal::from(*i as i32)),
-        Some(DataType::String(s)) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
+        DataType::Float(f) => Some(BigDecimal::from((*f * 100_f64).round() as i32) / 100),
+        DataType::Int(i) => Some(BigDecimal::from(*i as i32)),
+        DataType::String(s) => BigDecimal::from_str(&s.replace(",", ".")).ok(),
         _ => None,
     }
 }
 
+#[must_use]
 pub fn convert_naivedate_to_datatype(date: NaiveDate) -> DataType {
     let ret = NaiveDate::signed_duration_since(date, NaiveDate::from_ymd(1899, 12, 30));
     DataType::DateTime(ret.num_days() as f64)
@@ -121,8 +125,8 @@ mod tests {
 
     #[test]
     fn float_date() {
-        let date_test = Some(&&DataType::Float(16112020.0));
-        let ret = crate::convert_date(date_test).unwrap();
+        let date_test = DataType::Float(16112020.0);
+        let ret = crate::convert_date(&&date_test).unwrap();
         assert_eq!(ret.year(), 2020);
         assert_eq!(ret.month(), 11);
         assert_eq!(ret.day(), 16);
