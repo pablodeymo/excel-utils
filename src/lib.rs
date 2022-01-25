@@ -83,8 +83,8 @@ pub fn convert_string(field_value: &&DataType) -> Option<String> {
                 Some(s.trim().to_string())
             }
         }
-        DataType::Float(f) => Some(format!("{f}")),
-        DataType::Int(i) => Some(format!("{i}")),
+        DataType::Float(f) => Some(format!("{}", f)),
+        DataType::Int(i) => Some(format!("{}", i)),
         _ => None,
     }
 }
