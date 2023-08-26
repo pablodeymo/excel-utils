@@ -25,7 +25,7 @@ pub fn write_header(
             .map_err(|e| anyhow!("Error setting width. {:?}", e))?;
 
         worksheet
-            .write_string(starting_row, col, *text, Some(&format))
+            .write_string(starting_row, col, text, Some(format))
             .map_err(|e| anyhow!("Error writting header. {:?}", e))?;
     }
 
@@ -72,12 +72,12 @@ pub fn write_content_table(
                         0.0,
                     );
                     worksheet
-                        .write_datetime(row, col, &datetime, Some(&datetime_format))
+                        .write_datetime(row, col, &datetime, Some(datetime_format))
                         .map_err(|e| anyhow!("Error writting date. {:?}", e))?;
                 }
                 Some(DataType::Float(f)) => {
                     worksheet
-                        .write_number(row, col, *f as f64, None)
+                        .write_number(row, col, *f, None)
                         .map_err(|e| anyhow!("Error writting float. {:?}", e))?;
                 }
                 _ => {}
@@ -92,7 +92,7 @@ pub fn write_content_table(
 
         // Print "Total" as a title in the last row
         worksheet
-            .write_string(row, 0, "Total", Some(&format_total_row))
+            .write_string(row, 0, "Total", Some(format_total_row))
             .map_err(|e| anyhow!("Error writting string. {:?}", e))?;
 
         // Print each formula
@@ -112,7 +112,7 @@ pub fn write_content_table(
                     count_rows as u32 + starting_row
                 );
                 worksheet
-                    .write_formula_num(row, col, &formula, Some(&format_total_row), value)
+                    .write_formula_num(row, col, &formula, Some(format_total_row), value)
                     .map_err(|e| anyhow!("Error write formula num. {:?}", e))?;
             }
         }
