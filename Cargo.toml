@@ -9,12 +9,12 @@ rust-version = "1.67"
 
 [dependencies]
 anyhow = "1.0"
-calamine = "0.19"
+calamine = "0.21.2"
 chrono = { version = "0.4.19", features = ["serde"] }
 # bigdecimal crate version must match the one used by diesel
 bigdecimal = { version = "0.1.2", features = ["serde"] }
 
-xlsxwriter = { version = "0.5", optional = true  }
+xlsxwriter = { version = "0.6", optional = true }
 
 [features]
 enablewriter = ["xlsxwriter"]
