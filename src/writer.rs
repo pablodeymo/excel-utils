@@ -148,6 +148,28 @@ pub fn write_table(
     )
 }
 
+/// Given a list of tuples (first_col, last_col, width) set the width of the columns
+/// 
+/// # Arguments
+/// 
+/// * `worksheet` - The worksheet to set the column widths
+/// * `widths` - A list of tuples (first_col, last_col, width) where:
+///   * `first_col` - The first column to set the width
+///   * `last_col` - The last column to set the width
+///   * `width` - The width to set
+/// 
+/// # Errors
+/// 
+/// If there is an error setting the width, return an anyhow error.
+pub fn set_column_widths(worksheet: &mut Worksheet, widths: &[(u16, u16, f64)]) -> Result<()> {
+    for (first_col, last_col, width) in widths.iter() {
+        worksheet
+        .set_column(*first_col, *last_col, *width, None)
+        .map_err(|e| anyhow!("Error setting width. {:?}", e))?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use calamine::DataType;
